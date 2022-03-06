@@ -1,32 +1,28 @@
+import java.util.List;
+
+
+
 public class ThreadCheckArray implements Runnable 
 {
-	private boolean flag;
+	private boolean flag1;
 	private boolean [] winArray;
 	SharedData sd;
 	int[] array;
+	List<Integer> list;
 	int b;
 	
-	/**
-	 * @param sd 
-	 * constrctor
-	 */
 	public ThreadCheckArray(SharedData sd) 
 	{
 		this.sd = sd;	
 		synchronized (sd) 
 		{
-			array = sd.getArray();
+			list = sd.getArray();
 			b = sd.getB();
 		}		
-		winArray = new boolean[array.length];
+		
+		winArray = new boolean[list.size()];
 	}
 	
-	/**
-	 * @param n
-	 * @param b
-	 * this function implements the algorithm, as an input we get : n the number of elements in the array and b : the number that we want to search a solution for
-	 * 
-	 */
 	void rec(int n, int b)
 	{
 		synchronized (sd) 
@@ -36,21 +32,21 @@ public class ThreadCheckArray implements Runnable
 		}	
 		if (n == 1)
 		{
-			if(b == 0 || b == array[n-1])
+			if(b == 0 || b == list.get(n-1))
 			{
-				flag = true;
+				flag1 = true;
 				synchronized (sd) 
 				{
 					sd.setFlag(true);
 				}			
 			}
-			if (b == array[n-1])
+			if (b == list.get(n-1))
 				winArray[n-1] = true;
 			return;
 		}
 		
-		rec(n-1, b - array[n-1]);
-		if (flag)
+		rec(n-1, b - list.get(n-1));
+		if (flag1)
 			winArray[n-1] = true;
 		synchronized (sd) 
 		{
@@ -60,30 +56,26 @@ public class ThreadCheckArray implements Runnable
 		rec(n-1, b);
 	}
 
-	/**
-	 *this class implements runnable 
-	 *thread number 1 is with the last element and thread 2 is without
-	 */
 	public void run() {
-		if (array.length != 1)
+		if (list.size() != 1)
 			if (Thread.currentThread().getName().equals("thread1"))
-				rec(array.length-1, b - array[array.length - 1]);
+				rec(list.size()-1, b - list.get(list.size()-1));
 			else 
-				rec(array.length-1, b);
-		if (array.length == 1)
-			if (b == array[0] && !flag)
+				rec(list.size()-1, b);
+		if (list.size() == 1)
+			if (b == list.get(0) && !flag1)
 			{
 				winArray[0] = true;
-				flag = true;
+				flag1 = true;
 				synchronized (sd) 
 				{
 					sd.setFlag(true);
 				}
 			}
-		if (flag)
+		if (flag1)
 		{
 			if (Thread.currentThread().getName().equals("thread1"))
-				winArray[array.length - 1] = true;
+				winArray[list.size() - 1] = true;
 			synchronized (sd) 
 			{
 				sd.setWinArray(winArray);
