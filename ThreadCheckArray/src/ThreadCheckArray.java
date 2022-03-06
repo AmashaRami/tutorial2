@@ -6,6 +6,10 @@ public class ThreadCheckArray implements Runnable
 	int[] array;
 	int b;
 	
+	/**
+	 * @param sd 
+	 * constrctor
+	 */
 	public ThreadCheckArray(SharedData sd) 
 	{
 		this.sd = sd;	
@@ -17,6 +21,12 @@ public class ThreadCheckArray implements Runnable
 		winArray = new boolean[array.length];
 	}
 	
+	/**
+	 * @param n
+	 * @param b
+	 * this function implements the algorithm, as an input we get : n the number of elements in the array and b : the number that we want to search a solution for
+	 * 
+	 */
 	void rec(int n, int b)
 	{
 		synchronized (sd) 
@@ -50,6 +60,10 @@ public class ThreadCheckArray implements Runnable
 		rec(n-1, b);
 	}
 
+	/**
+	 *this class implements runnable 
+	 *thread number 1 is with the last element and thread 2 is without
+	 */
 	public void run() {
 		if (array.length != 1)
 			if (Thread.currentThread().getName().equals("thread1"))
